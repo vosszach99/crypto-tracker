@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crypto Tracker</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #00ffcc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #1e1e1e;
+    }
+    input, select {
+      padding: 6px;
+      background: #1e1e1e;
+      color: white;
+      border: 1px solid #444;
+    }
+    .section {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Crypto Tracker (Dark Mode)</h1>
+
+  <table id="portfolioTable">
+    <thead>
+      <tr>
+        <th>Coin</th>
+        <th>Held Amount</th>
+        <th>Buy Price</th>
+        <th>Current Price</th>
+        <th>Target Price</th>
+        <th>Current Value</th>
+        <th>Target Value</th>
+        <th>Profit / Loss</th>
+      </tr>
+    </thead>
+    <tbody id="portfolioBody">
+      <!-- Populated dynamically -->
+    </tbody>
+  </table>
+
+  <div class="section">
+    <h2>Add/Update Holdings</h2>
+    <form id="updateForm">
+      Coin:
+      <select id="coinSelect">
+        <option value="xrp">XRP</option>
+        <option value="pepe">PEPE</option>
+        <option value="bonk">BONK</option>
+        <option value="shiba">SHIB</option>
+      </select>
+      Amount: <input type="number" id="amount" step="any" required />
+      Buy Price: <input type="number" id="buyPrice" step="any" required />
+      Target Price: <input type="number" id="targetPrice" step="any" required />
+      <button type="submit">Update Portfolio</button>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Manual Trade Log</h2>
+    <form id="tradeForm">
+      Coin: <input type="text" id="tradeCoin" required />
+      Amount: <input type="number" id="tradeAmount" step="any" required />
+      Price per Coin: <input type="number" id="tradePrice" step="any" required />
+      Date: <input type="date" id="tradeDate" required />
+      Location Held: <input type="text" id="tradeLocation" required />
+      <button type="submit">Add Trade</button>
+    </form>
+
+    <table id="tradeTable">
+      <thead>
+        <tr>
+          <th>Coin</th>
+          <th>Amount</th>
+          <th>Price per Coin</th>
+          <th>Date</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody id="tradeBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const holdings = {};
+
+    async function fetchPrice(id) {
+      const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`);
+      const data = await res.json();
+      return data[id]?.usd || 0;
+    }
+
+    async function updatePortfolioDisplay() {
+      const tbody = document.getElementById("portfolioBody");
+      tbody.innerHTML = "";
+      for (const coin in holdings) {
+        const { amount, buyPrice, targetPrice } = holdings[coin];
+        const currentPrice = await fetchPrice(coin);
+        const currentValue = currentPrice * amount;
+        const targetValue = targetPrice * amount;
+        const profitLoss = currentValue - (buyPrice * amount);
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${coin.toUpperCase()}</td>
+          <td>${amount.toLocaleString()}</td>
+          <td>$${buyPrice.toFixed(6)}</td>
+          <td>$${currentPrice.toFixed(6)}</td>
+          <td>$${targetPrice.toFixed(6)}</td>
+          <td>$${currentValue.toFixed(2)}</td>
+          <td>$${targetValue.toFixed(2)}</td>
+          <td style="color:${profitLoss >= 0 ? 'lime' : 'red'}">$${profitLoss.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    document.getElementById("updateForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const coin = document.getElementById("coinSelect").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+      const buyPrice = parseFloat(document.getElementById("buyPrice").value);
+      const targetPrice = parseFloat(document.getElementById("targetPrice").value);
+      holdings[coin] = { amount, buyPrice, targetPrice };
+      updatePortfolioDisplay();
+    });
+
+    document.getElementById("tradeForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const coin = document.getElementById("tradeCoin").value;
+      const amount = document.getElementById("tradeAmount").value;
+      const price = document.getElementById("tradePrice").value;
+      const date = document.getElementById("tradeDate").value;
+      const location = document.getElementById("tradeLocation").value;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${coin}</td>
+        <td>${amount}</td>
+        <td>$${parseFloat(price).toFixed(6)}</td>
+        <td>${date}</td>
+        <td>${location}</td>
+      `;
+      document.getElementById("tradeBody").appendChild(row);
+      document.getElementById("tradeForm").reset();
+    });
+
+    // Auto refresh every 10 seconds
+    setInterval(updatePortfolioDisplay, 10000);
+  </script>
+</body>
+</html>
