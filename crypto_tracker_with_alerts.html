@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Crypto Tracker with Alerts</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #00ffcc;
+    }
+    canvas {
+      background-color: #1e1e1e;
+      border: 1px solid #444;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #444;
+      text-align: center;
+    }
+    th {
+      background-color: #1e1e1e;
+    }
+    button {
+      margin: 5px;
+      padding: 6px 12px;
+      background: #1e1e1e;
+      color: white;
+      border: 1px solid #555;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2a2a2a;
+    }
+    .alert {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Advanced Crypto Tracker</h1>
+
+  <div>
+    <button onclick="showGraph('ALL')">All Coins</button>
+    <button onclick="showGraph('XRP')">XRP</button>
+    <button onclick="showGraph('PEPE')">PEPE</button>
+    <button onclick="showGraph('BONK')">BONK</button>
+    <button onclick="showGraph('SHIB')">SHIB</button>
+    <button onclick="showGraph('DOGE')">DOGE</button>
+  </div>
+
+  <canvas id="portfolioChart" width="600" height="300"></canvas>
+
+  <h2>Holdings</h2>
+  <table id="holdingsTable">
+    <thead>
+      <tr>
+        <th>Coin</th>
+        <th>Amount</th>
+        <th>Buy Price</th>
+        <th>Total Invested</th>
+        <th>Date</th>
+        <th>Current Price</th>
+        <th>Current Value</th>
+        <th>Profit / Loss</th>
+        <th>Alert</th>
+      </tr>
+    </thead>
+    <tbody id="holdingsBody"></tbody>
+  </table>
+
+  <script>
+    let chart;
+
+    const alertThresholds = {
+      XRP: { soft: 3.00, target: 4.00 },
+      DOGE: { soft: 0.23, target: 0.35 },
+      PEPE: { soft: 0.000010, target: 0.000012 },
+      BONK: { soft: 0.000017, target: 0.000025 },
+      SHIB: { soft: 0.000016, target: 0.000025 }
+    };
+
+    const currentPrices = {
+      XRP: 2.446,
+      PEPE: 0.00000798,
+      BONK: 0.00001423,
+      SHIB: 0.00001357,
+      DOGE: 0.189081
+    };
+
+    async function loadData() {
+      const res = await fetch('trades.json');
+      const trades = await res.json();
+
+      const dailyTotals = {};
+      const coinDaily = {};
+      const holdingsMap = {};
+
+      for (const trade of trades) {
+        const { coin, amount, price, date } = trade;
+        const invested = amount * price;
+
+        if (!dailyTotals[date]) dailyTotals[date] = 0;
+        dailyTotals[date] += invested;
+
+        if (!coinDaily[coin]) coinDaily[coin] = {};
+        if (!coinDaily[coin][date]) coinDaily[coin][date] = 0;
+        coinDaily[coin][date] += invested;
+
+        if (!holdingsMap[coin]) holdingsMap[coin] = [];
+        holdingsMap[coin].push({ amount, price, date });
+      }
+
+      drawTable(holdingsMap);
+      drawChart("ALL", dailyTotals, coinDaily);
+    }
+
+    function drawTable(holdingsMap) {
+      const tbody = document.getElementById("holdingsBody");
+      tbody.innerHTML = "";
+
+      for (const coin in holdingsMap) {
+        const upperCoin = coin.toUpperCase();
+        holdingsMap[coin].forEach(({ amount, price, date }) => {
+          const currentPrice = currentPrices[upperCoin];
+          const currentValue = amount * currentPrice;
+          const invested = amount * price;
+          const profitLoss = currentValue - invested;
+          let alertMsg = "—";
+          if (currentPrice >= alertThresholds[upperCoin]?.target) {
+            alertMsg = "<span class='alert' style='color:lime'>TARGET HIT!</span>";
+          } else if (currentPrice >= alertThresholds[upperCoin]?.soft) {
+            alertMsg = "<span class='alert' style='color:yellow'>Soft Sell Zone</span>";
+          }
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${coin}</td>
+            <td>${amount.toLocaleString()}</td>
+            <td>$${price.toFixed(6)}</td>
+            <td>$${invested.toFixed(2)}</td>
+            <td>${date}</td>
+            <td>$${currentPrice.toFixed(6)}</td>
+            <td>$${currentValue.toFixed(2)}</td>
+            <td style="color:${profitLoss >= 0 ? 'lime' : 'red'}">$${profitLoss.toFixed(2)}</td>
+            <td>${alertMsg}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    }
+
+    function drawChart(type, dailyTotals, coinDaily) {
+      const ctx = document.getElementById("portfolioChart").getContext("2d");
+      if (chart) chart.destroy();
+
+      let labels, data;
+      if (type === "ALL") {
+        labels = Object.keys(dailyTotals).sort();
+        data = labels.map(date => dailyTotals[date]);
+      } else {
+        const coinData = coinDaily[type] || {};
+        labels = Object.keys(coinData).sort();
+        data = labels.map(date => coinData[date]);
+      }
+
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: type === "ALL" ? "Total Portfolio Value (USD)" : `${type} Value`,
+            data: data,
+            borderColor: "lime",
+            backgroundColor: "rgba(0,255,0,0.1)",
+            tension: 0.2,
+            fill: true
+          }]
+        },
+        options: {
+          scales: {
+            x: { ticks: { color: "#ccc" } },
+            y: { beginAtZero: true, ticks: { color: "#ccc" } }
+          },
+          plugins: {
+            legend: { labels: { color: "#ccc" } }
+          }
+        }
+      });
+    }
+
+    function showGraph(type) {
+      fetch('trades.json')
+        .then(res => res.json())
+        .then(trades => {
+          const dailyTotals = {};
+          const coinDaily = {};
+
+          for (const trade of trades) {
+            const { coin, amount, price, date } = trade;
+            const invested = amount * price;
+            if (!dailyTotals[date]) dailyTotals[date] = 0;
+            dailyTotals[date] += invested;
+            if (!coinDaily[coin]) coinDaily[coin] = {};
+            if (!coinDaily[coin][date]) coinDaily[coin][date] = 0;
+            coinDaily[coin][date] += invested;
+          }
+
+          drawChart(type, dailyTotals, coinDaily);
+        });
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
