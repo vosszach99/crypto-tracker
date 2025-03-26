@@ -1,0 +1,103 @@
+body {
+    background-color: #121212;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    transition: background 0.3s, color 0.3s;
+}
+
+body.light {
+    background-color: #f4f4f4;
+    color: #111;
+}
+
+h2 {
+    text-align: center;
+}
+
+canvas {
+    background-color: #1e1e1e;
+    border: 1px solid #444;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    padding: 8px;
+    border: 1px solid #444;
+    text-align: center;
+}
+
+th {
+    background-color: #1e1e1e;
+}
+
+button {
+    margin: 5px;
+    padding: 6px 12px;
+    background: #1e1e1e;
+    color: white;
+    border: 1px solid #555;
+    cursor: pointer;
+}
+
+.alert {
+    font-weight: bold;
+}
+
+body.light canvas,
+body.light th {
+    background-color: #ddd;
+    color: #111;
+}
+
+body.light button {
+    background: #ddd;
+    color: black;
+}
+
+.progress-wrapper {
+    width: 1000px;
+    height: 40px;
+    background-color: #111;
+    border: 3px solid #00ff99;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 0 10px #00ff99 inset;
+    margin: 20px auto;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #00ff99;
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+}
+
+.dollar-icon {
+    position: absolute;
+    top: -10px;
+    width: 50px;
+    height: 50px;
+    z-index: 2;
+    transition: left 0.5s ease-in-out;
+}
+
+.progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 0;
+    line-height: 40px;
+    font-weight: bold;
+    color: white;
+    z-index: 1;
+    pointer-events: none;
+}
