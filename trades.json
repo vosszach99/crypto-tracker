@@ -42,14 +42,14 @@
         "location": "Robinhood"
     },
     {
-        "coin": "WIF",
+        "coin": "DOGWIFHAT",
         "amount": 36.429872,
         "price": 0.549,
         "date": "2025-03-26",
         "location": "Robinhood"
     },
     {
-        "coin": "WIF",
+        "coin": "DOGWIFHAT",
         "amount": 8.35,
         "price": 0.56,
         "date": "2025-03-26",
@@ -57,9 +57,107 @@
     },
     {
         "coin": "PEPE",
-        "amount": 547674,
-        "price": 0.0000086,
+        "amount": 540137,
+        "price": 0.00000864,
         "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "XRP",
+        "amount": -5.052,
+        "price": -2.425,
+        "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "DOGE",
+        "amount": -69.11,
+        "price": -0.187856,
+        "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "SHIB",
+        "amount": -363108,
+        "price": -0.00001371,
+        "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "PEPE",
+        "amount": 1135381,
+        "price": 0.00000871,
+        "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "PEPE",
+        "amount": 1000000,
+        "price": 0.00000866,
+        "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "PEPE",
+        "amount": 10000,
+        "price": 0.00000869,
+        "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "PEPE",
+        "amount": 314482,
+        "price": 0.00000854,
+        "date": "2025-03-26",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "PEPE",
+        "amount": 1000000,
+        "price": 0.00000781,
+        "date": "2025-03-28",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "DOGE",
+        "amount": 22,
+        "price": 0.19,
+        "date": "2025-03-28",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "DOGE",
+        "amount": 8.89,
+        "price": 0.194791,
+        "date": "2025-03-28",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "DOGE",
+        "amount": -100,
+        "price": -0.178348,
+        "date": "2025-03-28",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "DOGE",
+        "amount": 100,
+        "price": 0.180942,
+        "date": "2025-03-28",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "DOGE",
+        "amount": 30,
+        "price": 0.182379,
+        "date": "2025-03-28",
+        "location": "Robinhood"
+    },
+    {
+        "coin": "XRP",
+        "amount": 10,
+        "price": 2.331,
+        "date": "2025-03-28",
         "location": "Robinhood"
     }
 ]
